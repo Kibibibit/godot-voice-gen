@@ -1,0 +1,101 @@
+[gd_scene load_steps=3 format=3 uid="uid://cffy3mxt0yfq7"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_uo8cx"]
+[ext_resource type="Script" path="res://scripts/voice_gen.gd" id="2_pupha"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uo8cx")
+
+[node name="TextEdit" type="TextEdit" parent="."]
+layout_mode = 0
+offset_right = 1001.0
+offset_bottom = 165.0
+text = "The quick brown fox jumps over the lazy dog"
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 587.0
+offset_top = 368.0
+offset_right = 662.0
+offset_bottom = 425.0
+text = "Play"
+
+[node name="HSliderPitch" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 182.0
+offset_right = 417.0
+offset_bottom = 221.0
+min_value = 0.01
+max_value = 5.0
+step = 0.01
+value = 2.0
+
+[node name="HSliderSpeed" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 260.0
+offset_right = 421.0
+offset_bottom = 299.0
+min_value = 0.01
+max_value = 0.5
+step = 0.01
+value = 0.1
+
+[node name="HSliderRange" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 224.0
+offset_right = 419.0
+offset_bottom = 263.0
+max_value = 1.0
+step = 0.01
+value = 0.1
+
+[node name="Pitch" type="Label" parent="."]
+layout_mode = 0
+offset_left = 437.0
+offset_top = 188.0
+offset_right = 477.0
+offset_bottom = 211.0
+
+[node name="Speed" type="Label" parent="."]
+layout_mode = 0
+offset_left = 440.0
+offset_top = 266.0
+offset_right = 480.0
+offset_bottom = 289.0
+
+[node name="Range" type="Label" parent="."]
+layout_mode = 0
+offset_left = 434.0
+offset_top = 231.0
+offset_right = 474.0
+offset_bottom = 254.0
+
+[node name="VSliderVoice" type="VSlider" parent="."]
+layout_mode = 0
+offset_top = 319.0
+offset_right = 103.0
+offset_bottom = 430.0
+
+[node name="VoiceGen" type="Node" parent="."]
+script = ExtResource("2_pupha")
+
+[node name="Timer" type="Timer" parent="VoiceGen"]
+one_shot = true
+
+[node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="VoiceGen"]
+
+[node name="Voice" type="Label" parent="."]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 359.0
+offset_right = 108.0
+offset_bottom = 382.0
