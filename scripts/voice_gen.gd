@@ -1,17 +1,13 @@
 extends Node
 class_name VoiceGen
 
-var voices = [
+const voices = [
 	"dan",
 	"danwahwah",
 	"danbackwards"
 ]
 
-var sounds = {
-	
-}
-
-const numbers = {
+const _numbers = {
 	"0":"zero",
 	"1":"one",
 	"2":"two",
@@ -24,34 +20,47 @@ const numbers = {
 	"9":"nine"
 }
 
-var queue: Array = []
-var pitch_curve: Array = []
+var _sounds = {
+	
+}
 
-@export
-var player: Node
+var _queue: Array = []
+var _pitch_curve: Array = []
+var _timer: Timer
 
-var timer: Timer
+## This is the directory where all the voice assets are stored.
+@export_dir var voice_path: String
 
-@export
-var pitch: float
-@export
-var pitch_range: float
-@export
-var speed: float
-@export
-var question_pitch: float
-@export
-var question_length: int
-@export
-var voice: int = 0
+## This should be any of the AudioStreamPlayer objects, and will be used to play the audio
+@export var player: Node
+
+@export_group("Voice Settings")
+
+## This is the base pitch that the voice will be played at, as a multiplier of the base
+## audio's pitch. This will also increase the speed of the player.
+@export var pitch: float
+
+## The pitch multiplier [pitch] will be modified up and down by up to this amount randomly
+## on each letter.
+@export var pitch_range: float
+
+## This is the time in seconds each letter is played for.
+@export var speed: float
+
+## This is the amount the pitch multiplier will increase by for each letter at the end of a question.
+@export var question_pitch: float
+## This is how many letters before a question mark the pitch will rise for
+@export var question_length: int
+## This choses which voice from [voices] will play
+@export var voice: int = 0
 
 
 func _ready():
-	timer = Timer.new()
-	timer.autostart = false
-	timer.one_shot = true
-	timer.name = "Timer"
-	add_child(timer)
+	_timer = Timer.new()
+	_timer.autostart = false
+	_timer.one_shot = true
+	_timer.name = "Timer"
+	add_child(_timer)
 	assert(
 		player.get_class() == "AudioStreamPlayer2D" || 
 		player.get_class() == "AudioStreamPlayer3D" || 
@@ -61,50 +70,49 @@ func _ready():
 	
 	
 	for v in voices:
-		sounds[v] = {}
+		_sounds[v] = {}
 		for letter in "abcdefghijklmnopqrstuvwxyz":
-			sounds[v][letter] = load("res://assets/%s/%s.wav" % [v,letter])
-			print("Loaded %s/%s.wav" % [v,letter])
+			_sounds[v][letter] = load("%s/%s/%s.wav" % [voice_path,v,letter])
+			print("Loaded %s/%s/%s.wav" % [voice_path,v,letter])
 
-	timer.timeout.connect(_play_sound)
+	_timer.timeout.connect(_play_sound)
 
 func play(text: String):
 	stop()
 	
-	for number in numbers.keys():
+	for number in _numbers.keys():
 		while (text.contains(number)):
-			text = text.replace(number, numbers[number])
-	queue = text.to_lower().split()
-	pitch_curve = []
-	for i in range(0,queue.size()):
-		pitch_curve.append(max(0.01, pitch + randf_range(-pitch_range,pitch_range)))
-		if (queue[i] == "?"):
+			text = text.replace(number, _numbers[number])
+	_queue = text.to_lower().split()
+	_pitch_curve = []
+	## Handling pithc changes
+	for i in range(0,_queue.size()):
+		_pitch_curve.append(max(0.01, pitch + randf_range(-pitch_range,pitch_range)))
+		## if its a question mark, go back a few steps and raise the pitch
+		if (_queue[i] == "?"):
 			for q in question_length:
 				if (i-q > 0):
 					var mult = question_length-q
-					pitch_curve[i-q-1] = pitch + question_pitch*(mult)
+					_pitch_curve[i-q-1] = pitch + question_pitch*(mult)
 					
-	
-
-		
 	_play_sound()
 
 func stop():
-	timer.stop()
+	_timer.stop()
 	player.stop()
-	queue = []
+	_queue = []
 	
 func _play_sound():
 	player.stop()
-	if (queue.is_empty()):
+	if (_queue.is_empty()):
 		return
-	var c = queue.pop_front()
-	var p = pitch_curve.pop_front()
-	if (sounds[voices[voice]].has(c)):
+	var c = _queue.pop_front()
+	var p = _pitch_curve.pop_front()
+	if (_sounds[voices[voice]].has(c)):
 		player.pitch_scale = p
-		player.stream = sounds[voices[voice]][c]
+		player.stream = _sounds[voices[voice]][c]
 		player.play()
 	
-	timer.start(speed)
+	_timer.start(speed)
 
 

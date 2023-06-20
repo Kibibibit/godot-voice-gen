@@ -98,6 +98,7 @@ ticks_on_borders = true
 
 [node name="VoiceGen" type="Node" parent="." node_paths=PackedStringArray("player")]
 script = ExtResource("2_pupha")
+voice_path = "res://assets"
 player = NodePath("AudioStreamPlayer2D")
 question_pitch = 0.2
 question_length = 3
