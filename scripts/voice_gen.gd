@@ -25,11 +25,12 @@ const numbers = {
 }
 
 var queue: Array = []
-@onready
-var player: AudioStreamPlayer2D = $AudioStreamPlayer2D
+var pitch_curve: Array = []
 
-@onready
-var timer: Timer = $Timer
+@export
+var player: Node
+
+var timer: Timer
 
 @export
 var pitch: float
@@ -38,9 +39,27 @@ var pitch_range: float
 @export
 var speed: float
 @export
+var question_pitch: float
+@export
+var question_length: int
+@export
 var voice: int = 0
 
+
 func _ready():
+	timer = Timer.new()
+	timer.autostart = false
+	timer.one_shot = true
+	timer.name = "Timer"
+	add_child(timer)
+	assert(
+		player.get_class() == "AudioStreamPlayer2D" || 
+		player.get_class() == "AudioStreamPlayer3D" || 
+		player.get_class() == "AudioStreamPlayer",
+		"Player must be an AudioStreamPlayer, either standard, 2D or 3D"
+	)
+	
+	
 	for v in voices:
 		sounds[v] = {}
 		for letter in "abcdefghijklmnopqrstuvwxyz":
@@ -56,6 +75,18 @@ func play(text: String):
 		while (text.contains(number)):
 			text = text.replace(number, numbers[number])
 	queue = text.to_lower().split()
+	pitch_curve = []
+	for i in range(0,queue.size()):
+		pitch_curve.append(max(0.01, pitch + randf_range(-pitch_range,pitch_range)))
+		if (queue[i] == "?"):
+			for q in question_length:
+				if (i-q > 0):
+					var mult = question_length-q
+					pitch_curve[i-q-1] = pitch + question_pitch*(mult)
+					
+	
+
+		
 	_play_sound()
 
 func stop():
@@ -66,11 +97,11 @@ func stop():
 func _play_sound():
 	player.stop()
 	if (queue.is_empty()):
-		print("empty queue")
 		return
 	var c = queue.pop_front()
+	var p = pitch_curve.pop_front()
 	if (sounds[voices[voice]].has(c)):
-		player.pitch_scale = max(0.01, pitch + randf_range(-pitch_range,pitch_range))
+		player.pitch_scale = p
 		player.stream = sounds[voices[voice]][c]
 		player.play()
 	
