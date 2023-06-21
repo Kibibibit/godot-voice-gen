@@ -4,7 +4,8 @@ class_name VoiceGen
 const voices = [
 	"dan",
 	"danwahwah",
-	"danbackwards"
+	"danbackwards",
+	"sam"
 ]
 
 const _numbers = {
