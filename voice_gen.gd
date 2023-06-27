@@ -1,7 +1,7 @@
 extends Node
 class_name VoiceGen
 
-var voices = []
+var voices: Array[String] = []
 
 const _letters = "abcdefghijklmnopqrstuvwxyz"
 const _numbers = {
