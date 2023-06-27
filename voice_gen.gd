@@ -74,16 +74,12 @@ func load_voices():
 	
 	if (directory == null):
 		return DirAccess.get_open_error()
-	
-	voices = directory.get_directories()
-	
-	if (voices.is_empty()):
-		push_warning("No voices in %s!",voice_path)
-		return
-	for v in voices:
+	voices = []
+	for v in directory.get_directories():
 		load_voice(v)
 
 func load_voice(voice_name: String):
+	voices.append(voice_name)
 	_sounds[voice_name] = {}
 	var directory: DirAccess = DirAccess.open("%s/%s" % [voice_path, voice_name])
 	if (directory == null):
