@@ -50,6 +50,8 @@ var _timer: Timer
 @export var question_length: int
 ## This choses which voice from [voices] will play
 @export var voice: int = 0
+## If true, all the voice files will be loaded when this Node calls _ready()
+@export var load_on_ready:bool = false
 
 func _ready():
 	_timer = Timer.new()
@@ -64,6 +66,8 @@ func _ready():
 		"Player must be an AudioStreamPlayer, either standard, 2D or 3D"
 	)
 	_timer.timeout.connect(_play_sound)
+	if (load_on_ready):
+		load_voices()
 
 func load_voices():
 	var directory: DirAccess = DirAccess.open(voice_path)
